@@ -1,0 +1,21 @@
+version: "1"
+resources:
+  - id: vpc-prod
+    type: vpc
+    provider: aws
+    attributes:
+      cidr: "10.0.0.0/16"
+      region: "us-east-1"
+  - id: subnet-public-1
+    type: subnet
+    provider: aws
+    attributes:
+      cidr: "10.0.1.0/24"
+      az: "us-east-1a"
+      public: "true"
+  - id: sg-web
+    type: security_group
+    provider: aws
+    attributes:
+      description: "Allow HTTP and HTTPS"
+      vpc_id: "vpc-prod"

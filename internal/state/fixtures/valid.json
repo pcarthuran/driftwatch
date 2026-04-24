@@ -1,0 +1,24 @@
+{
+  "version": "1",
+  "resources": [
+    {
+      "id": "vm-001",
+      "type": "virtual_machine",
+      "provider": "azure",
+      "attributes": {
+        "size": "Standard_B2s",
+        "region": "eastus",
+        "os": "ubuntu-22.04"
+      }
+    },
+    {
+      "id": "disk-001",
+      "type": "managed_disk",
+      "provider": "azure",
+      "attributes": {
+        "size_gb": "128",
+        "sku": "Premium_LRS"
+      }
+    }
+  ]
+}
