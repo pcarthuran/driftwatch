@@ -1,0 +1,16 @@
+# Go
+
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+vendor/
+.DS_Store
+Desktop.ini
+Thumbs.db
+*.out
+*.test
+coverage.txt
+.env
+*.prof
