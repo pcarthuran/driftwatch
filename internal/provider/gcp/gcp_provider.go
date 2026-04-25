@@ -7,51 +7,47 @@ import (
 	"github.com/driftwatch/internal/provider"
 )
 
-const providerName = "gcp"
-
-// ResourceFetcher defines the interface for fetching GCP resources.
-type ResourceFetcher interface {
+// Fetcher defines the interface for fetching GCP resources.
+type Fetcher interface {
 	Fetch(ctx context.Context, projectID string) ([]provider.Resource, error)
 }
 
-// Provider implements provider.Provider for GCP.
-type Provider struct {
+// gcpProvider implements provider.Provider for GCP.
+type gcpProvider struct {
 	projectID string
-	fetcher   ResourceFetcher
+	fetcher   Fetcher
 }
 
-// New creates a GCP provider using the real fetcher.
-func New(projectID string) (*Provider, error) {
+// New creates a new GCP provider using the real fetcher.
+func New(projectID string) (provider.Provider, error) {
 	if projectID == "" {
 		return nil, fmt.Errorf("gcp: project_id is required")
 	}
-	return &Provider{
+	return &gcpProvider{
 		projectID: projectID,
 		fetcher:   &realFetcher{},
 	}, nil
 }
 
-// NewWithFetcher creates a GCP provider with a custom fetcher (for testing).
-func NewWithFetcher(projectID string, fetcher ResourceFetcher) (*Provider, error) {
+// NewWithFetcher creates a new GCP provider with a custom fetcher (for testing).
+func NewWithFetcher(projectID string, fetcher Fetcher) (provider.Provider, error) {
 	if projectID == "" {
 		return nil, fmt.Errorf("gcp: project_id is required")
 	}
-	return &Provider{
+	return &gcpProvider{
 		projectID: projectID,
 		fetcher:   fetcher,
 	}, nil
 }
 
-// Name returns the provider identifier.
-func (p *Provider) Name() string {
-	return providerName
+func (p *gcpProvider) Name() string {
+	return "gcp"
 }
 
-// Fetch retrieves live resources from GCP.
-func (p *Provider) Fetch(ctx context.Context) ([]provider.Resource, error) {
+func (p *gcpProvider) Fetch(ctx context.Context) ([]provider.Resource, error) {
 	resources, err := p.fetcher.Fetch(ctx, p.projectID)
 	if err != nil {
-		return nil, fmt.Errorf("gcp: fetch failed for project %q: %w", p.projectID, err)
+		return nil, fmt.Errorf("gcp: fetch failed: %w", err)
 	}
 	return resources, nil
 }
