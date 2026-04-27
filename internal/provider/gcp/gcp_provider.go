@@ -34,20 +34,25 @@ func NewWithFetcher(projectID string, fetcher Fetcher) (provider.Provider, error
 	if projectID == "" {
 		return nil, fmt.Errorf("gcp: project_id is required")
 	}
+	if fetcher == nil {
+		return nil, fmt.Errorf("gcp: fetcher must not be nil")
+	}
 	return &gcpProvider{
 		projectID: projectID,
 		fetcher:   fetcher,
 	}, nil
 }
 
+// Name returns the name of the provider.
 func (p *gcpProvider) Name() string {
 	return "gcp"
 }
 
+// Fetch retrieves all resources for the configured GCP project.
 func (p *gcpProvider) Fetch(ctx context.Context) ([]provider.Resource, error) {
 	resources, err := p.fetcher.Fetch(ctx, p.projectID)
 	if err != nil {
-		return nil, fmt.Errorf("gcp: fetch failed: %w", err)
+		return nil, fmt.Errorf("gcp: fetch failed for project %q: %w", p.projectID, err)
 	}
 	return resources, nil
 }
