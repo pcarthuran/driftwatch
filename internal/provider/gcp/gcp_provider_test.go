@@ -52,6 +52,21 @@ func TestGCPProvider_Fetch_Success(t *testing.T) {
 	}
 }
 
+func TestGCPProvider_Fetch_Empty(t *testing.T) {
+	p, err := gcp.NewWithFetcher("my-project", &mockFetcher{resources: []provider.Resource{}})
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+
+	got, err := p.Fetch(context.Background())
+	if err != nil {
+		t.Fatalf("unexpected fetch error: %v", err)
+	}
+	if len(got) != 0 {
+		t.Errorf("expected 0 resources, got %d", len(got))
+	}
+}
+
 func TestGCPProvider_Fetch_Error(t *testing.T) {
 	fetchErr := errors.New("gcp api unavailable")
 	p, err := gcp.NewWithFetcher("my-project", &mockFetcher{err: fetchErr})
