@@ -73,3 +73,13 @@ func Load(path string) (*Snapshot, error) {
 
 	return &snap, nil
 }
+
+// ResourceCount returns the number of resources captured in the snapshot.
+func (s *Snapshot) ResourceCount() int {
+	return len(s.Resources)
+}
+
+// Age returns the duration elapsed since the snapshot was captured.
+func (s *Snapshot) Age() time.Duration {
+	return time.Since(s.CapturedAt)
+}
