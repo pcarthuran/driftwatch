@@ -61,6 +61,18 @@ func TestSave_EmptyID_ReturnsError(t *testing.T) {
 	}
 }
 
+func TestSave_DuplicateID_ReturnsError(t *testing.T) {
+	dir := t.TempDir()
+	store, _ := audit.NewStore(dir)
+	e := sampleEntry("run-dup", time.Now())
+	if err := store.Save(e); err != nil {
+		t.Fatalf("first Save returned unexpected error: %v", err)
+	}
+	if err := store.Save(e); err == nil {
+		t.Fatal("expected error for duplicate ID, got nil")
+	}
+}
+
 func TestList_SortedDescending(t *testing.T) {
 	dir := t.TempDir()
 	store, _ := audit.NewStore(dir)
