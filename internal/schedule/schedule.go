@@ -10,13 +10,13 @@ import (
 
 // Entry represents a scheduled drift-check job.
 type Entry struct {
-	ID          string        `json:"id"`
-	Name        string        `json:"name"`
-	Provider    string        `json:"provider"`
-	StateFile   string        `json:"state_file"`
-	Interval    time.Duration `json:"interval_ns"`
-	LastRun     time.Time     `json:"last_run,omitempty"`
-	Enabled     bool          `json:"enabled"`
+	ID        string        `json:"id"`
+	Name      string        `json:"name"`
+	Provider  string        `json:"provider"`
+	StateFile string        `json:"state_file"`
+	Interval  time.Duration `json:"interval_ns"`
+	LastRun   time.Time     `json:"last_run,omitempty"`
+	Enabled   bool          `json:"enabled"`
 }
 
 // Store manages persisted schedule entries.
@@ -68,6 +68,21 @@ func (s *Store) List() ([]Entry, error) {
 		entries = append(entries, e)
 	}
 	return entries, nil
+}
+
+// Get returns a single schedule entry by ID.
+// It returns an error wrapping os.ErrNotExist if no entry with that ID is found.
+func (s *Store) Get(id string) (Entry, error) {
+	path := filepath.Join(s.dir, id+".json")
+	data, err := os.ReadFile(path)
+	if err != nil {
+		return Entry{}, fmt.Errorf("schedule: get %s: %w", id, err)
+	}
+	var e Entry
+	if err := json.Unmarshal(data, &e); err != nil {
+		return Entry{}, fmt.Errorf("schedule: decode %s: %w", id, err)
+	}
+	return e, nil
 }
 
 // Delete removes a schedule entry by ID.
