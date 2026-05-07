@@ -85,7 +85,7 @@ func init() {
 				return err
 			}
 			if err := store.Delete(args[0]); err != nil {
-				return err
+				return fmt.Errorf("deleting schedule %q: %w", args[0], err)
 			}
 			fmt.Printf("Schedule %q deleted.\n", args[0])
 			return nil
