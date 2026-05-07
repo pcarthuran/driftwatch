@@ -89,3 +89,42 @@ func TestWrite_CountsCorrect(t *testing.T) {
 		t.Error("expected 'aws' row in output")
 	}
 }
+
+func TestCompute_ByProvider_DriftCounts(t *testing.T) {
+	groups := group.Compute(sampleResults(), group.ByProvider)
+
+	// Build a map for easier lookup by key.
+	byKey := make(map[string]group.Group)
+	for _, g := range groups {
+		byKey[g.Key] = g
+	}
+
+	cases := []struct {
+		provider     string
+		wantTotal    int
+		wantDrifted  int
+	}{
+		{"aws", 2, 1},
+		{"gcp", 2, 1},
+		{"azure", 1, 0},
+	}
+	for _, tc := range cases {
+		g, ok := byKey[tc.provider]
+		if !ok {
+			t.Errorf("group %q not found", tc.provider)
+			continue
+		}
+		if len(g.Results) != tc.wantTotal {
+			t.Errorf("provider %q: expected %d total resources, got %d", tc.provider, tc.wantTotal, len(g.Results))
+		}
+		drifted := 0
+		for _, r := range g.Results {
+			if r.Drifted {
+				drifted++
+			}
+		}
+		if drifted != tc.wantDrifted {
+			t.Errorf("provider %q: expected %d drifted, got %d", tc.provider, tc.wantDrifted, drifted)
+		}
+	}
+}
